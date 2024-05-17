@@ -1,0 +1,37 @@
+.welcome {
+    /* background-image: linear-gradient(to left, rgb(97, 169, 250), rgb(33, 210, 154), rgb(97, 169, 250), rgb(33, 210, 154), rgb(10, 173, 179));
+    -webkit-background-clip: text;
+    -moz-background-clip: text;
+    background-clip: text;
+    color: transparent; */
+    color: #fe9090;
+    font-size: 70px;
+    margin-top: 70px;
+    margin-right: 36px;
+  }
+  
+  
+  .coder {
+    height: 100%;
+    width: 93%;
+    margin-top: 0%;
+  }
+  
+  
+  .link{
+  cursor: pointer;
+  color: #fe9090;
+  }
+  
+  .disable{
+    padding: 6px 26px;
+    margin-left: 460px;
+    margin-top: 30px;
+    border: none;
+    background-color: #c9c9c9;
+    color: #fff;
+    border-radius: 5px;
+    font-size: 16px; 
+  }
+  
+  

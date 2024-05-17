@@ -1,0 +1,43 @@
+.custom-navbar {
+    background-color: #fe9090;
+    padding: 10px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+   }
+   .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+   }
+   .brand {
+    display: flex;
+    align-items: center; 
+   }
+   .brand img {
+    width: 60px;
+    height: 60px;
+   }
+   .brand-link {
+    font-weight: 800;
+    font-size: 30px;
+    color: white;
+    text-decoration: none;
+    margin-left: 10px;
+   }
+   .nav-links {
+    list-style: none;
+    display: flex;
+   }
+   .nav-links li {
+    font-weight: 500;
+    margin-right: 1rem;
+    color: white;
+    margin-top: 10px;
+    margin-left: 60px;
+   }
+   .nav-link {
+    text-decoration: none;
+    font-weight: bold;
+   }
+   .nav-link:hover {
+    text-decoration: underline;
+   }
