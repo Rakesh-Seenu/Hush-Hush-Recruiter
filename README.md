@@ -11,6 +11,9 @@ Hush-Hush-Recruiter is an automated recruitment tool written in Python 3 that st
 - **Automated Emails:** Automatically sends emails to selected candidates for further examination rounds.
 - **Backend Maintenance:** Managed by the Viseral app for seamless backend operations.
 
+![image](https://github.com/Rakesh-Seenu/Hush-Hush-Recruiter/assets/126412041/ef63f0e1-4fc4-4959-85e7-5d6acad54945)
+
+
 ## Table of Contents
 
 - [Installation](#installation)
