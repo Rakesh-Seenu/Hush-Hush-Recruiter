@@ -1,6 +1,6 @@
 # Hush-Hush-Recruiter
 
-Hush-Hush-Recruiter is an automated recruitment tool written in Python 3 that streamlines the entire process of selecting potential candidates for Doodle firm. This secretive process automates the selection analysis and sends an email to a candidate if they are selected for a potential role at Doodle.
+Hush-Hush-Recruiter is an automated recruitment tool that streamlines the entire process of selecting potential candidates for Doodle firm. This secretive process automates the selection analysis and sends an email to a candidate if they are selected for a potential role at Doodle.
 
 ## Features
 
