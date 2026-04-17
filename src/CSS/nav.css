@@ -1,70 +1,86 @@
 .custom-navbar {
-    background-color: #fe9090;
-    padding: 10px 0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-   }
-   .container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-   }
-   .brand {
-    display: flex;
-    align-items: center; 
-   }
-   .brand img {
-    width: 60px;
-    height: 60px;
-   }
-   .brand-link {
-    font-weight: 800;
-    font-size: 30px;
-    color: white;
-    text-decoration: none;
-    margin-left: 10px;
-   }
-   .nav-links {
-    list-style: none;
-    display: flex;
-   }
-   .nav-links li {
-    font-weight: 500;
-    margin-right: 1rem;
-    color: white;
-    margin-top: 10px;
-    margin-left: 60px;
-   }
-   .nav-link {
-    text-decoration: none;
-    font-weight: bold;
-        color: #fff;
-   }
-   .nav-link:hover {
-    text-decoration: underline;
-   }
+  background-color: var(--surface-color);
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+}
+
+.brand img {
+  width: 40px;
+  height: 40px;
+}
+
+.brand-link {
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--text-color);
+  text-decoration: none;
+  margin-left: 10px;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links li {
+  margin: 0;
+}
+
+.nav-link {
+  text-decoration: none;
+  font-weight: 600;
+  color: var(--text-color-dark);
+  transition: color 0.2s;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: var(--primary-color);
+}
 
 .role-chip {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 84px;
-    padding: 6px 10px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.25);
-    color: #fff;
-    font-size: 0.8rem;
-    font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.375rem 0.75rem;
+  border-radius: 999px;
+  background: var(--primary-color);
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 600;
 }
 
 .logout-button {
-    border: none;
-    border-radius: 8px;
-    padding: 8px 12px;
-    font-weight: 700;
-    color: #9f1239;
-    background: #fff;
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  color: var(--text-color);
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
 .logout-button:hover {
-    opacity: 0.9;
+  background-color: var(--border-color);
+  color: white;
 }

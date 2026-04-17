@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { FiMail, FiCheckCircle, FiAlertCircle, FiLoader } from 'react-icons/fi';
 import '../CSS/dashboard.css';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '';
@@ -20,7 +21,11 @@ function DashBoard() {
         }
 
         const data = await response.json();
-        const normalizedCandidates = (data.candidates || []).map((candidate) => ({
+        
+        // Ensure candidates are unique by username
+        const uniqueCandidates = Array.from(new Map((data.candidates || []).map(item => [item.username, item])).values());
+
+        const normalizedCandidates = uniqueCandidates.map((candidate) => ({
           ...candidate,
           emailSent: false,
           sending: false,
@@ -81,95 +86,95 @@ function DashBoard() {
 
   return (
     <div className="dashboard-shell">
-      <section className="dashboard-hero">
-        <div className="dashboard-hero-copy">
-          <p className="dashboard-eyebrow">Admin shortlist console</p>
-          <h1>Review matched CVs and trigger the next-round email in one place.</h1>
-          <p>
-            This dashboard shows the candidates already matched by the selection pipeline.
-            Each row can be emailed individually for the next interview stage.
-          </p>
-        </div>
+      <header className="dashboard-header">
+        <h1>Admin Dashboard</h1>
+        <p>Review matched CVs and trigger next-round emails.</p>
+      </header>
 
-        <div className="dashboard-hero-card">
-          <div className="hero-card-row">
-            <span>Shortlisted</span>
-            <strong>{shortlistedCount}</strong>
-          </div>
-          <div className="hero-card-row">
-            <span>Email sent</span>
-            <strong>{sentCount}</strong>
-          </div>
-          <div className="hero-card-row">
-            <span>Pending</span>
-            <strong>{pendingCount}</strong>
-          </div>
+      {message && (
+        <div className="toast toast-success">
+          <FiCheckCircle /> {message}
+        </div>
+      )}
+      {error && (
+        <div className="toast toast-error">
+          <FiAlertCircle /> {error}
+        </div>
+      )}
+
+      <section className="dashboard-metrics">
+        <div className="metric-card">
+          <h2>Shortlisted</h2>
+          <p>{shortlistedCount}</p>
+        </div>
+        <div className="metric-card">
+          <h2>Emails Sent</h2>
+          <p>{sentCount}</p>
+        </div>
+        <div className="metric-card">
+          <h2>Pending</h2>
+          <p>{pendingCount}</p>
         </div>
       </section>
 
-      {message ? <div className="notice-banner success">{message}</div> : null}
-      {error ? <div className="notice-banner error">{error}</div> : null}
-
-      <section className="dashboard-table-card">
-        <div className="section-header">
-          <div>
-            <h2>Matched candidates</h2>
-            <p>Send the next-round invite directly from the shortlist.</p>
-          </div>
-          <button className="refresh-button" onClick={() => window.location.reload()}>
-            Refresh
-          </button>
-        </div>
-
+      <section className="dashboard-table">
         {loading ? (
-          <div className="table-state">Loading shortlisted candidates...</div>
-        ) : candidates.length === 0 ? (
-          <div className="table-state">No shortlisted candidates found yet.</div>
-        ) : (
-          <div className="table-scroll">
-            <table className="candidate-table">
-              <thead>
-                <tr>
-                  <th>Candidate</th>
-                  <th>Email</th>
-                  <th>Followers</th>
-                  <th>Cluster</th>
-                  <th>Languages</th>
-                  <th>Status</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {candidates.map((candidate) => (
-                  <tr key={candidate.id ?? candidate.username}>
-                    <td>
-                      <div className="candidate-name">{candidate.username}</div>
-                    </td>
-                    <td>{candidate.email || 'Not available'}</td>
-                    <td>{candidate.followers ?? 'N/A'}</td>
-                    <td>
-                      <span className="cluster-pill">{candidate.cluster}</span>
-                    </td>
-                    <td className="candidate-languages">{candidate.languages || 'N/A'}</td>
-                    <td>
-                      <span className={`status-pill ${candidate.emailSent ? 'sent' : 'pending'}`}>
-                        {candidate.emailSent ? 'Email sent' : 'Ready to send'}
-                      </span>
-                    </td>
-                    <td>
-                      <button
-                        className="send-button"
-                        onClick={() => handleSendEmail(candidate.username)}
-                        disabled={candidate.sending || candidate.emailSent}
-                      >
-                        {candidate.sending ? 'Sending...' : candidate.emailSent ? 'Sent' : 'Send Email'}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="loading-state">
+            <FiLoader className="spinner" />
+            <p>Loading candidates...</p>
           </div>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>Candidate</th>
+                <th>Email</th>
+                <th>GitHub Profile</th>
+                <th>Score</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {candidates.map((candidate) => (
+                <tr key={candidate.username}>
+                  <td>{candidate.username}</td>
+                  <td>{candidate.email || 'N/A'}</td>
+                  <td>
+                    <a
+                      href={`https://github.com/${candidate.username}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      View Profile
+                    </a>
+                  </td>
+                  <td>{candidate.total_score}</td>
+                  <td>
+                    <button
+                      className="btn-send-email"
+                      onClick={() => handleSendEmail(candidate.username)}
+                      disabled={candidate.sending || candidate.emailSent}
+                    >
+                      {candidate.sending ? (
+                        <FiLoader className="spinner" />
+                      ) : candidate.emailSent ? (
+                        <FiCheckCircle />
+                      ) : (
+                        <FiMail />
+                      )}
+                      <span>
+                        {candidate.sending
+                          ? 'Sending...'
+                          : candidate.emailSent
+                          ? 'Sent'
+                          : 'Send Email'}
+                      </span>
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </section>
     </div>

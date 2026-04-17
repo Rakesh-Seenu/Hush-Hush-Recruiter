@@ -2,106 +2,167 @@
   min-height: 100vh;
   display: grid;
   place-items: center;
-  padding: 24px;
-  background:
-    radial-gradient(circle at 20% 10%, rgba(14, 165, 233, 0.2), transparent 30%),
-    radial-gradient(circle at 80% 90%, rgba(249, 115, 22, 0.2), transparent 32%),
-    linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+  padding: 1.5rem;
+  background-color: var(--background-color);
 }
 
 .auth-card {
-  width: min(520px, 100%);
-  padding: 32px;
-  border-radius: 24px;
-  border: 1px solid rgba(15, 23, 42, 0.12);
-  box-shadow: 0 24px 50px rgba(15, 23, 42, 0.12);
-  background: rgba(255, 255, 255, 0.95);
+  width: 100%;
+  max-width: 450px;
+  padding: 2.5rem;
+  border-radius: 1rem;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  background-color: var(--surface-color);
 }
 
-.auth-eyebrow {
-  margin: 0;
-  color: #475569;
-  font-size: 0.8rem;
+.auth-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.auth-header h1 {
+  font-size: 1.875rem;
   font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  color: var(--text-color);
+  margin: 0 0 0.5rem 0;
 }
 
-.auth-card h1 {
-  margin: 10px 0 20px;
-  color: #0f172a;
-  font-size: clamp(1.6rem, 4vw, 2.2rem);
+.auth-header p {
+  color: var(--text-color-dark);
 }
 
 .portal-switch {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 16px;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  background-color: var(--background-color);
+  padding: 0.25rem;
+  border-radius: 0.5rem;
 }
 
 .portal-switch button {
-  border: 1px solid rgba(148, 163, 184, 0.4);
-  border-radius: 12px;
-  padding: 10px 12px;
-  background: #f8fafc;
-  color: #334155;
-  font-weight: 700;
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.625rem 0.75rem;
+  background-color: transparent;
+  color: var(--text-color);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
 }
 
 .portal-switch button.active {
-  color: #fff;
-  background: #111827;
+  color: white;
+  background-color: var(--primary-color);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .auth-form {
   display: grid;
-  gap: 8px;
+  gap: 1rem;
+}
+
+.form-group {
+  display: grid;
+  gap: 0.5rem;
 }
 
 .auth-form label {
-  margin-top: 8px;
-  text-align: left;
-  font-weight: 700;
-  color: #334155;
+  font-weight: 600;
+  color: var(--text-color);
 }
 
 .auth-form input {
-  border: 1px solid rgba(148, 163, 184, 0.6);
-  border-radius: 10px;
-  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 0.375rem;
+  padding: 0.75rem 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background-color: var(--surface-color);
+  color: var(--text-color);
+}
+
+.auth-form input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
 }
 
 .auth-error {
-  margin: 8px 0 0;
-  color: #b91c1c;
-  font-weight: 600;
-  text-align: left;
+  margin: 0;
+  color: #ff6b6b;
+  font-weight: 500;
+  font-size: 0.875rem;
 }
 
 .auth-submit {
-  margin-top: 14px;
+  margin-top: 1rem;
   border: none;
-  border-radius: 10px;
-  padding: 12px;
-  color: #fff;
+  border-radius: 0.375rem;
+  padding: 0.875rem;
+  color: white;
   font-weight: 700;
-  background: linear-gradient(135deg, #0ea5e9, #2563eb);
+  background-color: var(--primary-color);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.auth-submit:hover {
+  background-color: var(--primary-color-light);
 }
 
 .auth-submit:disabled {
-  opacity: 0.65;
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .auth-toggle {
-  margin: 18px 0 0;
-  color: #475569;
+  margin-top: 1.5rem;
+  text-align: center;
+  color: var(--text-color-dark);
+}
+
+.auth-link {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 0.25rem;
+}
+
+.auth-link:hover {
+  text-decoration: underline;
+}
+
+.verification-notice {
+  text-align: center;
+}
+
+.verification-notice .icon {
+  color: var(--secondary-color);
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.verification-notice h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.verification-notice p {
+  color: var(--text-color-dark);
+  margin-bottom: 1.5rem;
 }
 
 .auth-link {
   margin-left: 8px;
   border: none;
   background: transparent;
-  color: #2563eb;
+  color: var(--primary-color);
   font-weight: 700;
 }

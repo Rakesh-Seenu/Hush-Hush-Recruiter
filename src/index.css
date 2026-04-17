@@ -1,15 +1,25 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --primary-color: #3b82f6; /* Blue 500 */
+  --primary-color-light: #60a5fa; /* Blue 400 */
+  --secondary-color: #14b8a6; /* Teal 500 */
+  --text-color: #e5e7eb; /* Gray 200 */
+  --text-color-dark: #9ca3af; /* Gray 400 */
+  --background-color: #111827; /* Gray 900 */
+  --surface-color: #1f2937; /* Gray 800 */
+  --border-color: #374151; /* Gray 700 */
+}
 
 body {
   margin: 0;
-  font-family: 'Manrope', sans-serif;
+  font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #f6f9ff;
-  color: #0f172a;
+  background-color: var(--background-color);
+  color: var(--text-color);
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }

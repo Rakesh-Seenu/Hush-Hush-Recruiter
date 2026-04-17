@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
+  sendEmailVerification,
   signInWithEmailAndPassword,
   signOut,
 } from 'firebase/auth';
@@ -47,7 +48,11 @@ export function AuthProvider({ children }) {
       role,
       loading,
       login: (email, password) => signInWithEmailAndPassword(auth, email, password),
-      register: (email, password) => createUserWithEmailAndPassword(auth, email, password),
+      register: async (email, password) => {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        await sendEmailVerification(userCredential.user);
+        return userCredential;
+      },
       logout: () => signOut(auth),
       getRoleForEmail,
     }),

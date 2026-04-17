@@ -3,24 +3,25 @@
   display: grid;
   place-items: center;
   padding: 24px;
-  background:
-    radial-gradient(circle at top left, rgba(249, 115, 22, 0.2), transparent 36%),
-    linear-gradient(180deg, #fffaf5 0%, #f8fafc 100%);
+  background-color: var(--background-color);
+  background-image:
+    radial-gradient(circle at top left, rgba(59, 130, 246, 0.15), transparent 36%),
+    linear-gradient(180deg, var(--surface-color) 0%, var(--background-color) 100%);
 }
 
 .candidate-card {
   width: min(780px, 100%);
   padding: 32px;
   border-radius: 26px;
-  background: #fff;
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  box-shadow: 0 24px 45px rgba(15, 23, 42, 0.1);
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 24px 45px rgba(0, 0, 0, 0.3);
   text-align: left;
 }
 
 .candidate-eyebrow {
   margin: 0;
-  color: #64748b;
+  color: var(--text-color-dark);
   font-size: 0.8rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -29,13 +30,13 @@
 
 .candidate-card h1 {
   margin: 10px 0;
-  color: #0f172a;
+  color: var(--text-color);
   font-size: clamp(1.8rem, 3vw, 2.5rem);
 }
 
 .candidate-card p {
   margin: 0;
-  color: #475569;
+  color: var(--text-color-dark);
   line-height: 1.7;
 }
 
@@ -47,21 +48,21 @@
 }
 
 .candidate-status-item {
-  border: 1px solid rgba(148, 163, 184, 0.25);
+  border: 1px solid var(--border-color);
   border-radius: 14px;
   padding: 16px;
-  background: #f8fafc;
+  background: rgba(59, 130, 246, 0.1);
 }
 
 .candidate-status-item span {
-  color: #64748b;
+  color: var(--text-color-dark);
   font-weight: 600;
 }
 
 .candidate-status-item strong {
   display: block;
   margin-top: 6px;
-  color: #0f172a;
+  color: var(--text-color);
   font-size: 1.1rem;
 }
 
