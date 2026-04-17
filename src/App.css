@@ -1,6 +1,15 @@
 .App {
-    text-align: center;
-  }
+  min-height: 100vh;
+  text-align: center;
+}
+
+.route-loading {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  color: #334155;
+  font-weight: 700;
+}
   
   .App-logo {
     height: 40vmin;

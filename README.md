@@ -1,76 +1,119 @@
 # Hush-Hush-Recruiter
 
-Hush-Hush-Recruiter is an automated recruitment tool that streamlines the entire process of selecting potential candidates for Doodle firm. This secretive process automates the selection analysis and sends an email to a candidate if they are selected for a potential role at Doodle.
+A privacy-first recruitment workflow demo with:
+- Firebase login
+- Separate admin and candidate dashboards
+- Shortlisted candidate table for admins
+- Per-candidate "Send Email" action for next round
 
-## Features
+## Architecture
 
-- **Data Fetching:** Fetches candidate data from GitHub through API.
-- **Data Preprocessing:** Cleans and preprocesses the fetched data.
-- **Candidate Selection:** Uses K-means clustering algorithm for selecting candidates.
-- **Database Integration:** Stores candidate names in a database.
-- **Automated Emails:** Automatically sends emails to selected candidates for further examination rounds.
-- **Backend Maintenance:** Managed by the Viseral app for seamless backend operations.
+- Frontend: React + React Router
+- Auth: Firebase Authentication
+- Backend API: Python HTTP server ([backend/api.py](backend/api.py))
+- Storage: SQLite ([Database.db](Database.db))
+- Mail: SMTP via environment variables
 
-![image](https://github.com/Rakesh-Seenu/Hush-Hush-Recruiter/assets/126412041/ef63f0e1-4fc4-4959-85e7-5d6acad54945)
+## Important Compliance Note
 
+For Germany/EU compliance, do not scrape candidate data without consent.
+This project now supports running with existing database data and consent-based flows.
 
-## Table of Contents
+## 1) Prerequisites
 
-- [Installation](#installation)
-- [Usage](#usage)
-- [Configuration](#configuration)
-- [Contributing](#contributing)
-- [License](#license)
+- Node.js 18+
+- Python 3.10+
+- A Firebase project with Email/Password sign-in enabled
 
-## Installation
+## 2) Environment Setup
 
-1. **Clone the repository:**
-    ```bash
-    git clone https://github.com/Rakesh-Seenu/Hush-Hush-Recruiter.git
-    ```
-2. **Navigate to the project directory:**
-    ```bash
-    Hush-Hush-Recruiter
-    ```
-3. **Install the required dependencies:**
-    ```bash
-    pip install -r requirements.txt
-    ```
+1. Copy [.env.example](.env.example) to `.env`.
+2. Fill in Firebase values:
+   - `REACT_APP_FIREBASE_API_KEY`
+   - `REACT_APP_FIREBASE_AUTH_DOMAIN`
+   - `REACT_APP_FIREBASE_PROJECT_ID`
+   - `REACT_APP_FIREBASE_STORAGE_BUCKET`
+   - `REACT_APP_FIREBASE_MESSAGING_SENDER_ID`
+   - `REACT_APP_FIREBASE_APP_ID`
+3. Set admin emails in `REACT_APP_ADMIN_EMAILS` (comma-separated).
+4. Set mail credentials:
+   - `DOODLE_EMAIL_SENDER`
+   - `DOODLE_EMAIL_PASSWORD`
 
-## Usage
+## 3) Install Dependencies
 
-1. **Fetch Data:**
-    ```python
-    from data_fetcher import fetch_data
-    data = fetch_data()
-    ```
+### Python
 
-2. **Preprocess and Clean Data:**
-    ```python
-    from data_preprocessor import preprocess_data
-    cleaned_data = preprocess_data(data)
-    ```
+```bash
+pip install -r requirements.txt
+```
 
-3. **Candidate Selection using K-means Clustering:**
-    ```python
-    from candidate_selector import select_candidates
-    selected_candidates = select_candidates(cleaned_data)
-    ```
+### Frontend
 
-4. **Store Selected Candidates in Database:**
-    ```python
-    from database_manager import store_candidates
-    store_candidates(selected_candidates)
-    ```
+```bash
+npm install
+```
 
-5. **Send Automated Emails:**
-    ```python
-    from email_sender import send_emails
-    send_emails(selected_candidates)
-    ```
+## 4) Start the Project
 
-## Configuration
+Run these in separate terminals from project root.
 
-- **Database Configuration:** Ensure your database credentials are correctly configured in `database_manager.py`.
-- **Email Configuration:** Set up your email server settings in `email_sender.py`.
-- **API Configuration:** Update your GitHub API token in `data_fetcher.py`.
+### One-command start
+
+```bash
+npm run dev
+```
+
+This launches the backend API and the React app together.
+
+If you want to start them separately:
+
+```bash
+python -m backend.api
+```
+
+```bash
+npm start
+```
+
+Frontend runs on `http://localhost:3000` and proxies API requests to `http://localhost:8000`.
+
+## 5) How Login and Roles Work
+
+- Any user can register/login with Firebase Email/Password.
+- Role is derived from `REACT_APP_ADMIN_EMAILS`.
+  - If user email is in that list -> admin dashboard (`/admin`)
+  - Otherwise -> candidate dashboard (`/candidate`)
+
+## 6) Admin Flow (Email Button)
+
+1. Login with an admin email.
+2. Open dashboard (`/admin`).
+3. View matched candidates from SQLite.
+4. Click **Send Email** for any candidate row.
+
+Endpoints used:
+- `GET /api/selected-candidates`
+- `POST /api/selected-candidates/{username}/send-email`
+
+## 7) Optional Pipeline Run
+
+If you still want to run the old selection pipeline manually:
+
+```bash
+python -m backend.pipeline
+```
+
+This runs selection + insert + bulk send. It is no longer executed on import.
+
+## 8) Troubleshooting
+
+- `react-scripts is not recognized`
+  - Run `npm install` again in project root.
+- Login not working
+  - Verify Firebase config values in `.env`.
+  - Confirm Email/Password provider enabled in Firebase Console.
+- Admin dashboard redirects to candidate dashboard
+  - Add your login email to `REACT_APP_ADMIN_EMAILS`.
+- Send Email fails
+  - Verify `DOODLE_EMAIL_PASSWORD` and SMTP permissions.

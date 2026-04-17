@@ -37,7 +37,34 @@
    .nav-link {
     text-decoration: none;
     font-weight: bold;
+        color: #fff;
    }
    .nav-link:hover {
     text-decoration: underline;
    }
+
+.role-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 84px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.25);
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.logout-button {
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-weight: 700;
+    color: #9f1239;
+    background: #fff;
+}
+
+.logout-button:hover {
+    opacity: 0.9;
+}
