@@ -59,6 +59,36 @@ npm run dev            # starts BOTH apps (admin :5173, candidate :5174)
 # or individually: npm run dev:admin / npm run dev:candidate
 ```
 
+## Run in the cloud — no local tools, no admin rights
+
+Don't have Docker/Node/Python locally? Run the whole thing in the browser.
+
+### Option C — GitHub Codespaces (recommended, fastest)
+
+A full dev environment in your browser. Nothing installed on your machine.
+
+1. Push this branch to GitHub (done).
+2. On the repo page: **Code ▸ Codespaces ▸ Create codespace** on `rebuild/modern-pipeline-v2`.
+3. Wait for it to build (installs Node deps + Python deps automatically via `.devcontainer/`).
+4. In the terminal: `bash scripts/dev-all.sh` — starts the backend + both frontends.
+5. Open the **Ports** tab and click the 🌐 on **5173** (admin) and **5174** (candidate).
+
+Each frontend calls the backend **same-origin** through the Vite `/api` proxy, so it works despite Codespaces' forwarded-origin URLs. Keep forwarded ports **Private** (the default).
+
+### Option D — Deploy to public URLs (Render + Vercel/Netlify)
+
+All free tiers. **Deploy the backend first** — the frontends bake the backend URL in at build time.
+
+1. **Backend → Render.** Dashboard ▸ **New + ▸ Blueprint**, pick this repo. It reads [`render.yaml`](render.yaml). When prompted, set `DEMO_ADMIN_TOKEN` (any strong random string) and a temporary `CORS_ORIGINS`. Copy the service URL, e.g. `https://hush-backend.onrender.com`, and check `…/api/health`.
+2. **Frontends → Vercel or Netlify.** Import the repo **twice** (once per app):
+   - Vercel: set **Root Directory** to `apps/admin` (then again `apps/candidate`); [`vercel.json`](apps/admin/vercel.json) handles the rest.
+   - Netlify: set **Package directory** to `apps/admin` (then `apps/candidate`), leave Base directory blank; [`netlify.toml`](apps/admin/netlify.toml) handles the rest.
+   - For **both**, add env var `VITE_API_BASE_URL` = your Render URL (no trailing slash) and `VITE_AUTH_MODE=demo`.
+3. **Wire CORS.** Back in Render, set `CORS_ORIGINS` to the two deployed frontend origins (comma-separated, no trailing slash). It redeploys.
+4. Changing `VITE_API_BASE_URL` later? Rebuild the frontends (it's baked in at build time).
+
+> ⚠️ **Security — public demo auth.** In `AUTH_MODE=demo` the backend trusts the sign-in header, so **on a public URL anyone could claim admin**. Mitigations already wired in: the demo uses only **synthetic data**, `EMAIL_MODE=console` (nothing is actually sent), outreach is off, and **`DEMO_ADMIN_TOKEN`** locks admin behind a secret you type as the password. For anything with real data, switch to `AUTH_MODE=firebase` (see [Enabling real Firebase auth](#enabling-real-firebase-auth)).
+
 ## Demo accounts
 
 The app ships in **demo mode** — no Firebase, no external calls, no real emails. On first boot the backend seeds ~18 sample candidates by running the pipeline once.
@@ -68,7 +98,7 @@ The app ships in **demo mode** — no Firebase, no external calls, no real email
 | Recruiter Console | `admin@doodle.com`     | any value   |
 | Candidate Portal  | `candidate@doodle.com` | any value   |
 
-Roles are decided **on the backend** from `ADMIN_EMAILS` — the browser can't grant itself admin.
+Roles are decided **on the backend** from `ADMIN_EMAILS` — the browser can't grant itself admin. (On a public deploy where `DEMO_ADMIN_TOKEN` is set, the admin **password must equal that token**; candidates still use any password.)
 
 ## The pipeline
 

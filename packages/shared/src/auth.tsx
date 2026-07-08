@@ -19,6 +19,7 @@ const AUTH_MODE: AuthMode =
   (firebaseConfigured() ? "firebase" : "demo");
 
 const DEMO_KEY = "hush_demo_email";
+const DEMO_TOKEN_KEY = "hush_demo_token";
 
 interface AuthContextValue {
   mode: AuthMode;
@@ -43,6 +44,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const demoEmailRef = useRef<string | null>(
     typeof localStorage !== "undefined" ? localStorage.getItem(DEMO_KEY) : null,
   );
+  // In demo mode the password doubles as an optional admin token (X-Demo-Token),
+  // checked by the backend only when DEMO_ADMIN_TOKEN is configured there.
+  const demoTokenRef = useRef<string | null>(
+    typeof localStorage !== "undefined" ? localStorage.getItem(DEMO_TOKEN_KEY) : null,
+  );
 
   const getAuthHeaders: AuthHeaderProvider = useCallback(async () => {
     const headers: Record<string, string> = {};
@@ -52,6 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return headers;
     }
     if (demoEmailRef.current) headers["X-Demo-Email"] = demoEmailRef.current;
+    if (demoTokenRef.current) headers["X-Demo-Token"] = demoTokenRef.current;
     return headers;
   }, []);
 
@@ -107,7 +114,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await signInWithEmailAndPassword(auth, email, password);
       } else {
         demoEmailRef.current = email.trim().toLowerCase();
+        demoTokenRef.current = password;
         localStorage.setItem(DEMO_KEY, demoEmailRef.current);
+        localStorage.setItem(DEMO_TOKEN_KEY, password);
       }
       const me = await resolveMe();
       setUser(me);
@@ -128,7 +137,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } else {
       // demo: registration is the same as logging in.
       demoEmailRef.current = email.trim().toLowerCase();
+      demoTokenRef.current = password;
       localStorage.setItem(DEMO_KEY, demoEmailRef.current);
+      localStorage.setItem(DEMO_TOKEN_KEY, password);
     }
   }, []);
 
@@ -139,7 +150,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await signOut(auth);
     }
     demoEmailRef.current = null;
+    demoTokenRef.current = null;
     localStorage.removeItem(DEMO_KEY);
+    localStorage.removeItem(DEMO_TOKEN_KEY);
     setUser(null);
   }, []);
 

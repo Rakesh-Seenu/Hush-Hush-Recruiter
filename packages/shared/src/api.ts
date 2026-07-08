@@ -8,8 +8,14 @@ import type {
   PipelineStatus,
 } from "./types";
 
+// If VITE_API_BASE_URL is defined (even as an empty string) we honor it verbatim:
+//   - ""  -> same-origin requests (fetch("/api/...")), proxied by the Vite dev
+//            server. Required for GitHub Codespaces / any forwarded-origin host.
+//   - "https://api.example.com" -> absolute base for a deployed backend.
+// Only when the var is completely unset do we fall back to the local backend.
+const _rawApiBase = (import.meta as any).env?.VITE_API_BASE_URL;
 export const API_BASE_URL: string =
-  (import.meta as any).env?.VITE_API_BASE_URL || "http://localhost:8000";
+  _rawApiBase === undefined ? "http://localhost:8000" : _rawApiBase;
 
 /** Returns the auth headers to attach to each request (Bearer token or demo header). */
 export type AuthHeaderProvider = () => Promise<Record<string, string>>;

@@ -105,6 +105,7 @@ def _extract_email(authorization: str | None, x_demo_email: str | None) -> str |
 async def get_current_user(
     authorization: str | None = Header(default=None),
     x_demo_email: str | None = Header(default=None, alias="X-Demo-Email"),
+    x_demo_token: str | None = Header(default=None, alias="X-Demo-Token"),
 ) -> CurrentUser:
     email = _extract_email(authorization, x_demo_email)
     if not email:
@@ -113,7 +114,24 @@ async def get_current_user(
             detail="Not authenticated.",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    return CurrentUser(email=email.lower(), role=settings.role_for(email))
+
+    role = settings.role_for(email)
+
+    # In demo mode, admin is trusted from a header, which is fine locally but
+    # unsafe on a public URL. If DEMO_ADMIN_TOKEN is configured, require it to
+    # actually get admin (Firebase mode does real verification and skips this).
+    if (
+        settings.auth_mode == "demo"
+        and role == "admin"
+        and settings.demo_admin_token
+        and (x_demo_token or "") != settings.demo_admin_token
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Admin access in demo mode requires a valid token.",
+        )
+
+    return CurrentUser(email=email.lower(), role=role)
 
 
 async def require_admin(user: CurrentUser = Depends(get_current_user)) -> CurrentUser:

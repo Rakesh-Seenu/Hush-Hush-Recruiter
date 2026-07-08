@@ -1,0 +1,17 @@
+# Netlify config for the ADMIN site.
+# In the Netlify UI: set "Package directory" = apps/admin and leave
+# "Base directory" BLANK, so install + build run from the repo root (installing
+# the whole npm workspace). Paths below are relative to the base (= repo root).
+[build]
+  command = "npm run build --workspace @hush/admin"
+  publish = "apps/admin/dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# SPA history fallback for react-router routes ("/", "/candidates").
+# Real files (JS/CSS/assets) are served first; only unmatched paths hit this.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

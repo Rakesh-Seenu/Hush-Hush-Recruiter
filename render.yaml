@@ -1,0 +1,51 @@
+# Render.com Blueprint (Infrastructure as Code) — deploys the FastAPI backend.
+# Verified against the current Blueprint spec: https://render.com/docs/blueprint-spec
+# Place at the repo ROOT (Render looks here). Deploy: dashboard -> New + -> Blueprint.
+
+services:
+  - type: web
+    name: hush-backend
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.7
+
+      # --- App / demo mode (safe: synthetic data, console emails, outreach off) ---
+      - key: APP_ENV
+        value: production
+      - key: AUTH_MODE
+        value: demo
+      - key: PIPELINE_MODE
+        value: demo
+      - key: EMAIL_MODE
+        value: console
+      - key: ALLOW_OUTREACH
+        value: "false"
+      - key: AUTOPILOT_INTERVAL_MINUTES
+        value: "0"
+      - key: ADMIN_EMAILS
+        value: admin@doodle.com
+
+      # --- IMPORTANT for a PUBLIC demo: gate admin behind a secret so not just
+      #     anyone can claim admin via the X-Demo-Email header. Render prompts for
+      #     this at create time (sync:false). Enter any strong random string; you
+      #     then type it as the PASSWORD when signing into the admin console. ---
+      - key: DEMO_ADMIN_TOKEN
+        sync: false
+
+      # --- CORS: set to BOTH deployed frontend origins, comma-separated, NO
+      #     trailing slash, e.g.
+      #       https://hush-admin.vercel.app,https://hush-candidate.vercel.app
+      #     sync:false -> Render prompts at create; edit later once frontends exist. ---
+      - key: CORS_ORIGINS
+        sync: false
+
+      # DATABASE_URL is intentionally omitted: the backend defaults to SQLite and
+      # re-seeds demo data when empty, which is fine on the ephemeral free disk.
+      # For persistence, attach a free Render Postgres and add `psycopg[binary]`
+      # to backend/requirements.txt using a postgresql+psycopg:// URL.

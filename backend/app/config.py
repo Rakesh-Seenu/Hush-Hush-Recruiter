@@ -43,6 +43,10 @@ class Settings(BaseSettings):
     firebase_credentials_file: str = ""
     # Whoever is in this list is treated as an admin/recruiter.
     admin_emails: str = "admin@doodle.com"
+    # Optional shared secret that gates ADMIN access in demo mode. Leave empty
+    # for frictionless local dev / Codespaces. SET IT for any PUBLIC demo deploy
+    # so that not just anyone can claim admin via an X-Demo-Email header.
+    demo_admin_token: str = ""
 
     # --- Pipeline ------------------------------------------------------------
     # "demo" -> use bundled sample data (no network, no cold emails).

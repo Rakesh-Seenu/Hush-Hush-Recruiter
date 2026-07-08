@@ -14,5 +14,15 @@ export default defineConfig({
   server: {
     port: 5174,
     strictPort: true,
+    // Same-origin API in dev: the browser calls "/api/..." on this Vite origin
+    // and Vite proxies it server-side to the backend. This is what makes the app
+    // work in GitHub Codespaces, where the browser cannot reach localhost:8000
+    // from the forwarded frontend origin. Leave VITE_API_BASE_URL empty in dev.
+    proxy: {
+      "/api": {
+        target: "http://localhost:8000",
+        changeOrigin: true,
+      },
+    },
   },
 });
