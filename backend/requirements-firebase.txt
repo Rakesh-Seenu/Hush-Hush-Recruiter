@@ -1,0 +1,3 @@
+# Optional: only needed when AUTH_MODE=firebase (real ID-token verification).
+#   pip install -r requirements-firebase.txt
+firebase-admin>=6.5,<7.0

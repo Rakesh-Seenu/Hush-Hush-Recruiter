@@ -1,0 +1,15 @@
+# Netlify config for the CANDIDATE site.
+# In the Netlify UI: set "Package directory" = apps/candidate and leave
+# "Base directory" BLANK. Paths below are relative to the base (= repo root).
+[build]
+  command = "npm run build --workspace @hush/candidate"
+  publish = "apps/candidate/dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Harmless SPA fallback (candidate portal has no client-side routes).
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

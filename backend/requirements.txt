@@ -1,0 +1,12 @@
+# Base runtime + tests. Runs the app in demo/live mode without Firebase.
+# For real Firebase ID-token verification (AUTH_MODE=firebase), also install
+# requirements-firebase.txt.
+
+fastapi>=0.111,<1.0
+uvicorn[standard]>=0.30,<1.0
+pydantic>=2.7,<3.0
+pydantic-settings>=2.2,<3.0
+SQLAlchemy>=2.0,<3.0
+httpx>=0.27,<1.0
+
+pytest>=8.0,<9.0

@@ -1,0 +1,10 @@
+@import "@hush/shared/theme.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Admin console accent: indigo */
+:root {
+  --accent: 129 140 248;
+}

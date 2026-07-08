@@ -1,0 +1,28 @@
+{
+  "name": "Hush-Hush-Recruiter (full stack)",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
+  "features": {
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.12"
+    }
+  },
+  "forwardPorts": [8000, 5173, 5174],
+  "portsAttributes": {
+    "8000": { "label": "backend (FastAPI)", "onAutoForward": "silent" },
+    "5173": { "label": "admin (Vite)", "onAutoForward": "openPreview" },
+    "5174": { "label": "candidate (Vite)", "onAutoForward": "openPreview" }
+  },
+  "onCreateCommand": "chmod +x scripts/dev-all.sh || true",
+  "postCreateCommand": "npm install && pip install --user -r backend/requirements.txt",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "ms-python.python",
+        "bradlc.vscode-tailwindcss"
+      ]
+    }
+  },
+  "remoteUser": "node"
+}
