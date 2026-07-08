@@ -1,0 +1,10 @@
+@import "@hush/shared/theme.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Candidate portal accent: teal */
+:root {
+  --accent: 45 212 191;
+}

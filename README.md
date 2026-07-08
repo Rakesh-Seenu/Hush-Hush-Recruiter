@@ -1,119 +1,148 @@
 # Hush-Hush-Recruiter
 
-A privacy-first recruitment workflow demo with:
-- Firebase login
-- Separate admin and candidate dashboards
-- Shortlisted candidate table for admins
-- Per-candidate "Send Email" action for next round
+A consent-aware, transparently-scored recruiting pipeline with **two frontends**:
+
+- **Recruiter Console** (`apps/admin`) — run & monitor the autonomous pipeline, review ranked candidates, send consent-gated outreach.
+- **Candidate Portal** (`apps/candidate`) — every candidate sees exactly what data is held about them, their status in the funnel, and can grant or withdraw consent at any time.
+
+Both are React + TypeScript (Vite) apps sharing one design system, talking to a **FastAPI** backend.
+
+> **v2 rebuild.** This replaces the original prototype (raw `http.server`, unenforced auth, arbitrary KMeans cluster selection, unsolicited cold emails). See [What changed](#what-changed-from-v1).
+
+---
 
 ## Architecture
 
-- Frontend: React + React Router
-- Auth: Firebase Authentication
-- Backend API: Python HTTP server ([backend/api.py](backend/api.py))
-- Storage: SQLite ([Database.db](Database.db))
-- Mail: SMTP via environment variables
+```
+┌─────────────────┐     ┌──────────────────┐
+│  Recruiter      │     │  Candidate       │     apps/admin  (Vite+TS, :5173)
+│  Console :5173  │     │  Portal :5174    │     apps/candidate (Vite+TS, :5174)
+└────────┬────────┘     └────────┬─────────┘     packages/shared (design system,
+         │      @hush/shared      │                                API client, auth)
+         └───────────┬────────────┘
+                     ▼
+          ┌──────────────────────┐
+          │  FastAPI  :8000       │   backend/app
+          │  auth · roles · CORS  │   • Firebase/demo auth, roles enforced server-side
+          │  pipeline · scoring   │   • source → score → shortlist (autonomous)
+          │  SQLite (SQLAlchemy)  │   • consent-aware, safe-by-default outreach
+          └──────────────────────┘
+```
 
-## Important Compliance Note
+## Quick start
 
-For Germany/EU compliance, do not scrape candidate data without consent.
-This project now supports running with existing database data and consent-based flows.
-
-## 1) Prerequisites
-
-- Node.js 18+
-- Python 3.10+
-- A Firebase project with Email/Password sign-in enabled
-
-## 2) Environment Setup
-
-1. Copy [.env.example](.env.example) to `.env`.
-2. Fill in Firebase values:
-   - `REACT_APP_FIREBASE_API_KEY`
-   - `REACT_APP_FIREBASE_AUTH_DOMAIN`
-   - `REACT_APP_FIREBASE_PROJECT_ID`
-   - `REACT_APP_FIREBASE_STORAGE_BUCKET`
-   - `REACT_APP_FIREBASE_MESSAGING_SENDER_ID`
-   - `REACT_APP_FIREBASE_APP_ID`
-3. Set admin emails in `REACT_APP_ADMIN_EMAILS` (comma-separated).
-4. Set mail credentials:
-   - `DOODLE_EMAIL_SENDER`
-   - `DOODLE_EMAIL_PASSWORD`
-
-## 3) Install Dependencies
-
-### Python
+### Option A — Docker (one command)
 
 ```bash
+cp .env.example .env      # optional; safe demo defaults work as-is
+docker compose up
+```
+
+- API → http://localhost:8000 (interactive docs at `/docs`)
+- Recruiter Console → http://localhost:5173
+- Candidate Portal → http://localhost:5174
+
+### Option B — Local dev
+
+Prereqs: Node 18+, Python 3.10+.
+
+```bash
+# 1. Backend
+cd backend
+python -m venv .venv && . .venv/Scripts/activate   # Windows PowerShell: .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-```
+uvicorn app.main:app --reload --port 8000
 
-### Frontend
-
-```bash
+# 2. Frontends (from repo root, in another terminal)
 npm install
+npm run dev            # starts BOTH apps (admin :5173, candidate :5174)
+# or individually: npm run dev:admin / npm run dev:candidate
 ```
 
-## 4) Start the Project
+## Demo accounts
 
-Run these in separate terminals from project root.
+The app ships in **demo mode** — no Firebase, no external calls, no real emails. On first boot the backend seeds ~18 sample candidates by running the pipeline once.
 
-### One-command start
+| Portal            | Sign in as             | Password    |
+| ----------------- | ---------------------- | ----------- |
+| Recruiter Console | `admin@doodle.com`     | any value   |
+| Candidate Portal  | `candidate@doodle.com` | any value   |
+
+Roles are decided **on the backend** from `ADMIN_EMAILS` — the browser can't grant itself admin.
+
+## The pipeline
+
+`source → score → shortlist`, triggered from the console (or on a timer via `AUTOPILOT_INTERVAL_MINUTES`).
+
+- **Source** — bundled sample profiles (`PIPELINE_MODE=demo`) or the live GitHub API (`PIPELINE_MODE=live`, set `GITHUB_TOKEN`).
+- **Score** — a transparent, explainable 0–100 blend of normalized signals (weights are shown in the UI and served from `/api/scoring/weights`):
+
+  | Signal          | Weight |
+  | --------------- | ------ |
+  | followers       | 30%    |
+  | public repos    | 30%    |
+  | language breadth| 25%    |
+  | public gists    | 15%    |
+
+  Counts are log-compressed then min-max normalized across the batch — no arbitrary KMeans cluster ids.
+- **Shortlist** — top `SHORTLIST_SIZE` above `SCORE_THRESHOLD` move to the `shortlisted` stage.
+
+## Consent & outreach (safe by default)
+
+- A candidate who **declines** is never emailed.
+- Outreach is blocked unless `ALLOW_OUTREACH=true`.
+- `EMAIL_MODE=console` (default) logs emails instead of sending. Only `EMAIL_MODE=smtp` + valid creds sends for real.
+- Candidates manage their own consent from the portal.
+
+## Configuration
+
+Everything is env-driven — see [`.env.example`](.env.example). Key toggles: `AUTH_MODE`, `PIPELINE_MODE`, `EMAIL_MODE`, `ALLOW_OUTREACH`, `ADMIN_EMAILS`, `AUTOPILOT_INTERVAL_MINUTES`.
+
+### Enabling real Firebase auth
 
 ```bash
-npm run dev
+pip install -r backend/requirements-firebase.txt
+# backend: AUTH_MODE=firebase, FIREBASE_PROJECT_ID=..., FIREBASE_CREDENTIALS_FILE=...
+# frontend: VITE_AUTH_MODE=firebase, VITE_FIREBASE_* (see .env.example)
 ```
 
-This launches the backend API and the React app together.
+The frontend obtains a Firebase ID token; the backend verifies it with the Admin SDK and derives the role.
 
-If you want to start them separately:
+## Testing
 
 ```bash
-python -m backend.api
+cd backend && pip install -r requirements.txt && pytest        # backend (11 tests)
+npm run typecheck                                              # both frontends (strict TS)
+npm run build                                                  # production builds
 ```
 
-```bash
-npm start
+## Project structure
+
+```
+backend/
+  app/
+    main.py            # FastAPI app, CORS, lifespan, autopilot, seeding
+    config.py          # typed settings (all env-driven)
+    auth.py            # Firebase/demo auth + server-side role enforcement
+    db.py  models.py  schemas.py
+    routers/           # me, candidates, pipeline
+    services/          # github (source), scoring, emailer, pipeline, sample_data
+  tests/               # pytest
+packages/shared/       # @hush/shared — design system, typed API client, auth context
+apps/admin/            # Recruiter Console (Vite + React + TS + Tailwind)
+apps/candidate/        # Candidate Portal (Vite + React + TS + Tailwind)
+docker-compose.yml
 ```
 
-Frontend runs on `http://localhost:3000` and proxies API requests to `http://localhost:8000`.
+## What changed from v1
 
-## 5) How Login and Roles Work
-
-- Any user can register/login with Firebase Email/Password.
-- Role is derived from `REACT_APP_ADMIN_EMAILS`.
-  - If user email is in that list -> admin dashboard (`/admin`)
-  - Otherwise -> candidate dashboard (`/candidate`)
-
-## 6) Admin Flow (Email Button)
-
-1. Login with an admin email.
-2. Open dashboard (`/admin`).
-3. View matched candidates from SQLite.
-4. Click **Send Email** for any candidate row.
-
-Endpoints used:
-- `GET /api/selected-candidates`
-- `POST /api/selected-candidates/{username}/send-email`
-
-## 7) Optional Pipeline Run
-
-If you still want to run the old selection pipeline manually:
-
-```bash
-python -m backend.pipeline
-```
-
-This runs selection + insert + bulk send. It is no longer executed on import.
-
-## 8) Troubleshooting
-
-- `react-scripts is not recognized`
-  - Run `npm install` again in project root.
-- Login not working
-  - Verify Firebase config values in `.env`.
-  - Confirm Email/Password provider enabled in Firebase Console.
-- Admin dashboard redirects to candidate dashboard
-  - Add your login email to `REACT_APP_ADMIN_EMAILS`.
-- Send Email fails
-  - Verify `DOODLE_EMAIL_PASSWORD` and SMTP permissions.
+| v1 (prototype)                                   | v2 (this)                                            |
+| ------------------------------------------------ | ---------------------------------------------------- |
+| Raw `http.server`, hand-rolled routing           | FastAPI — validation, async, OpenAPI docs            |
+| No API auth; admin role baked into the JS bundle | Roles enforced server-side on every protected route  |
+| `ProtectedRoute` role gate silently disabled     | Gating verified by tests (401/403)                   |
+| KMeans `cluster in [2,3]` (arbitrary)            | Transparent, explainable 0–100 score                 |
+| Cold-emails scraped users; missing emails → a random Gmail | Consent-aware; safe demo mode; outreach off by default |
+| CRA + react-router v5, unused Redux/webcam deps  | Vite + React 18 + TS + react-router v6, lean deps    |
+| `Database.db` & `kmeans_model.pkl` committed     | Data/models gitignored                               |
+| Single mixed app                                 | Two focused frontends + shared design system         |

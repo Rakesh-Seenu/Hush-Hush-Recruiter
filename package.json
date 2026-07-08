@@ -1,50 +1,24 @@
 {
-  "name": "hiring-process",
-  "version": "0.1.0",
+  "name": "hush-hush-recruiter",
+  "version": "2.0.0",
   "private": true,
-  "proxy": "http://localhost:8000",
-  "dependencies": {
-    "@reduxjs/toolkit": "^2.1.0",
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "bootstrap": "^5.3.2",
-    "bootstrap-icons": "^1.11.3",
-    "firebase": "^10.13.2",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-icons": "^5.6.0",
-    "react-redux": "^9.1.0",
-    "react-router-dom": "^5.3.4",
-    "react-router-guards": "^1.0.2",
-    "react-scripts": "5.0.1",
-    "react-webcam": "^7.2.0",
-    "web-vitals": "^2.1.4"
-  },
+  "description": "Consent-aware, transparently-scored recruiting pipeline with an admin console and a candidate portal.",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "scripts": {
-    "start": "react-scripts start",
-    "dev": "powershell -ExecutionPolicy Bypass -File .\\start-all.ps1",
-    "backend": "python -m backend.api",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "dev": "concurrently -n admin,candidate -c magenta,cyan \"npm:dev:admin\" \"npm:dev:candidate\"",
+    "dev:admin": "npm run dev --workspace @hush/admin",
+    "dev:candidate": "npm run dev --workspace @hush/candidate",
+    "build": "npm run build --workspace @hush/admin && npm run build --workspace @hush/candidate",
+    "typecheck": "npm run typecheck --workspace @hush/admin && npm run typecheck --workspace @hush/candidate",
+    "lint": "npm run typecheck"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+  "devDependencies": {
+    "concurrently": "^9.1.0"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "engines": {
+    "node": ">=18"
   }
 }
